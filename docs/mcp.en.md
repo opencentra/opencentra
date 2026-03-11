@@ -1,0 +1,175 @@
+# MCP
+
+**MCP (Model Context Protocol)** allows CoPaw to connect to external MCP servers and use their tools. You can add MCP clients through the Console to extend CoPaw's capabilities.
+
+---
+
+## Prerequisites
+
+If using `npx` to run MCP servers, ensure you have:
+
+- **Node.js** version 18 or higher ([download](https://nodejs.org/))
+
+Check your Node.js version:
+
+```bash
+node --version
+```
+
+---
+
+## Adding MCP clients in the Console
+
+1. Open the Console and go to **Agent → MCP**
+2. Click **+ Create** button
+3. Paste your MCP client configuration in JSON format
+4. Click **Create** to import
+
+---
+
+## Configuration formats
+
+CoPaw supports three JSON formats for importing MCP clients:
+
+### Format 1: Standard mcpServers format (Recommended)
+
+```json
+{
+  "mcpServers": {
+    "client-name": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem"],
+      "env": {
+        "API_KEY": "your-api-key-here"
+      }
+    }
+  }
+}
+```
+
+### Format 2: Direct key-value format
+
+```json
+{
+  "client-name": {
+    "command": "npx",
+    "args": ["-y", "@modelcontextprotocol/server-filesystem"],
+    "env": {
+      "API_KEY": "your-api-key-here"
+    }
+  }
+}
+```
+
+### Format 3: Single client format
+
+```json
+{
+  "key": "client-name",
+  "name": "My MCP Client",
+  "command": "npx",
+  "args": ["-y", "@modelcontextprotocol/server-filesystem"],
+  "env": {
+    "API_KEY": "your-api-key-here"
+  }
+}
+```
+
+---
+
+## Transport Types
+
+CoPaw supports two MCP transport types:
+
+### 1. stdio Transport (Local Process)
+
+Use `command` and `args` to spawn a local MCP server process:
+
+```json
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "/path/to/dir"]
+    }
+  }
+}
+```
+
+### 2. HTTP/SSE Transport (Remote Server)
+
+Use `url` to connect to a remote HTTP MCP server:
+
+```json
+{
+  "mcpServers": {
+    "my-remote-mcp": {
+      "name": "my-remote-mcp",
+      "url": "http://192.168.3.102:1110/mcp",
+      "transport": "sse",
+      "headers": {
+        "Authorization": "Bearer your-token"
+      },
+      "timeout": 30
+    }
+  }
+}
+```
+
+**HTTP Configuration Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `url` | string | ✅ | MCP server URL |
+| `transport` | string | ❌ | Transport type: `sse` (default) or `streamable_http` |
+| `headers` | object | ❌ | Custom HTTP headers |
+| `timeout` | float | ❌ | Request timeout in seconds (default 30) |
+
+---
+
+## Example: Filesystem MCP server
+
+```json
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "/Users/username/Documents"
+      ]
+    }
+  }
+}
+```
+
+> Replace `/Users/username/Documents` with the directory path you want the agent to access.
+
+---
+
+## Example: Remote HTTP MCP server
+
+```json
+{
+  "mcpServers": {
+    "remote-tools": {
+      "name": "remote-tools",
+      "url": "http://192.168.3.102:1110/mcp",
+      "transport": "sse",
+      "timeout": 60
+    }
+  }
+}
+```
+
+---
+
+## Managing MCP clients
+
+Once imported, you can:
+
+- **View all clients** — See all MCP clients as cards on the MCP page
+- **Enable / Disable** — Toggle clients on or off without deleting them
+- **Edit configuration** — Click a card to view and edit the JSON configuration
+- **Delete clients** — Remove MCP clients you no longer need
