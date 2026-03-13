@@ -106,6 +106,7 @@ class CoPawAgent(ReActAgent):
         self._max_input_length = max_input_length
         self._mcp_clients = mcp_clients or []
         self._namesake_strategy = namesake_strategy
+        self._failed_mcp_clients: List[str] = []  # 记录失败的 MCP 客户端名称
 
         # Memory compaction threshold: configurable ratio of max_input_length
         self._memory_compact_threshold = int(
@@ -382,12 +383,16 @@ class CoPawAgent(ReActAgent):
                             recover_error,
                         ):
                             raise
+                        # 记录失败的 MCP 客户端
+                        self._failed_mcp_clients.append(client_name)
                         logger.warning(
                             "MCP client '%s' registration cancelled after "
                             "recovery, skipping",
                             client_name,
                         )
                     except Exception as e:  # pylint: disable=broad-except
+                        # 记录失败的 MCP 客户端
+                        self._failed_mcp_clients.append(client_name)
                         logger.warning(
                             "MCP client '%s' still unavailable after "
                             "recovery, skipping: %s",
@@ -395,6 +400,8 @@ class CoPawAgent(ReActAgent):
                             e,
                         )
                 else:
+                    # 记录失败的 MCP 客户端
+                    self._failed_mcp_clients.append(client_name)
                     logger.warning(
                         "MCP client '%s' recovery failed, skipping",
                         client_name,
@@ -455,6 +462,11 @@ class CoPawAgent(ReActAgent):
         # Fall back to propagating CancelledError to avoid swallowing
         # genuine task cancellations when we cannot inspect the state.
         return True
+
+    @property
+    def failed_mcp_clients(self) -> List[str]:
+        """Get list of failed MCP client names."""
+        return self._failed_mcp_clients
 
     @staticmethod
     async def _reconnect_mcp_client(
