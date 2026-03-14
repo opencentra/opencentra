@@ -34,8 +34,10 @@ jobs:
       - name: Install pnpm
         run: npm install -g pnpm
 
-      - name: Build agentscope-spark-design
+      - name: Clone and build agentscope-spark-design
         run: |
+          rm -rf console/packages/agentscope-spark-design
+          git clone --depth 1 https://github.com/opencentra/agentscope-spark-design.git console/packages/agentscope-spark-design
           cd console/packages/agentscope-spark-design
           pnpm install
           pnpm run build
