@@ -12,7 +12,7 @@ COPAW_HOME="${COPAW_HOME:-$HOME/.copaw}"
 COPAW_VENV="$COPAW_HOME/venv"
 COPAW_BIN="$COPAW_HOME/bin"
 PYTHON_VERSION="3.12"
-COPAW_REPO="https://github.com/agentscope-ai/CoPaw.git"
+COPAW_REPO="https://github.com/opencentra/opencentra.git"
 
 VERSION=""
 FROM_SOURCE=false
@@ -212,9 +212,9 @@ if [ "$FROM_SOURCE" = true ]; then
         # CLONE_DIR is cleaned up by trap; no need for cleanup_console
     fi
 else
-    PACKAGE="copaw"
+    PACKAGE="opencentra"
     if [ -n "$VERSION" ]; then
-        PACKAGE="copaw==$VERSION"
+        PACKAGE="opencentra==$VERSION"
     fi
 
     info "Installing ${PACKAGE}${EXTRAS_SUFFIX} from PyPI..."
