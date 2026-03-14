@@ -31,12 +31,10 @@ jobs:
           cache: "npm"
           cache-dependency-path: console/package-lock.json
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9
+      - name: Install pnpm
+        run: npm install -g pnpm
 
-      - name: Build local agentscope-spark-design package
+      - name: Build agentscope-spark-design
         run: |
           cd console/packages/agentscope-spark-design
           pnpm install
