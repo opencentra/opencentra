@@ -6,7 +6,9 @@ import os
 
 # 禁止局域网地址走系统代理（解决 Windows 控制面板代理导致 MCP 本地服务连接失败的问题）
 # httpx/requests 等库会读取 NO_PROXY 环境变量来跳过代理
-_NO_PROXY_DEFAULTS = "127.0.0.1,localhost,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,::1"
+_NO_PROXY_DEFAULTS = (
+    "127.0.0.1,localhost,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,::1"
+)
 if "NO_PROXY" in os.environ:
     # 合并已有的 NO_PROXY 设置
     existing = os.environ["NO_PROXY"]

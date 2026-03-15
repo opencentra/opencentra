@@ -49,7 +49,7 @@ Then open **http://127.0.0.1:8088/** in your browser.
 
 </div>
 
-Your Personal AI Assistant; easy to install, deploy 
+Your Personal AI Assistant; easy to install, deploy
 
 on your own machine or on the cloud; supports multiple chat apps with easily extensible capabilities.
 

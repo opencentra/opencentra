@@ -2,6 +2,7 @@
 """测试工具选择器"""
 import asyncio
 import sys
+
 sys.path.insert(0, "src")
 
 from copaw.agents.tool_selector import ToolSelector
@@ -10,6 +11,7 @@ from copaw.agents.tool_selector import ToolSelector
 # 模拟模型响应
 class MockResponse:
     """模拟响应"""
+
     def __init__(self, content):
         self.content = content
 
@@ -20,9 +22,14 @@ class MockModel:
     async def __call__(self, messages, **kwargs):
         """模拟调用模型"""
         # 返回模拟响应
-        return MockResponse([
-            {"type": "text", "text": '["read_file", "execute_shell_command"]'}
-        ])
+        return MockResponse(
+            [
+                {
+                    "type": "text",
+                    "text": '["read_file", "execute_shell_command"]',
+                },
+            ]
+        )
 
 
 # 模拟工具列表
@@ -32,32 +39,41 @@ MOCK_TOOLS = [
         "function": {
             "name": "execute_shell_command",
             "description": "Execute a shell command",
-            "parameters": {"type": "object", "properties": {"command": {"type": "string"}}}
-        }
+            "parameters": {
+                "type": "object",
+                "properties": {"command": {"type": "string"}},
+            },
+        },
     },
     {
         "type": "function",
         "function": {
             "name": "read_file",
             "description": "Read a file from disk",
-            "parameters": {"type": "object", "properties": {"file_path": {"type": "string"}}}
-        }
+            "parameters": {
+                "type": "object",
+                "properties": {"file_path": {"type": "string"}},
+            },
+        },
     },
     {
         "type": "function",
         "function": {
             "name": "browser_use",
             "description": "Control browser with Playwright",
-            "parameters": {"type": "object", "properties": {"action": {"type": "string"}}}
-        }
+            "parameters": {
+                "type": "object",
+                "properties": {"action": {"type": "string"}},
+            },
+        },
     },
     {
         "type": "function",
         "function": {
             "name": "get_current_time",
             "description": "Get current system time",
-            "parameters": {"type": "object", "properties": {}}
-        }
+            "parameters": {"type": "object", "properties": {}},
+        },
     },
 ]
 

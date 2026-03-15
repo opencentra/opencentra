@@ -27,8 +27,13 @@ CACHE_MAX_SIZE = 100
 
 # Fallback 默认核心工具（当 LLM 选择失败时使用）
 FALLBACK_TOOLS = {
-    "read_file", "write_file", "edit_file", "execute_shell_command",
-    "browser_use", "get_current_time", "desktop_screenshot"
+    "read_file",
+    "write_file",
+    "edit_file",
+    "execute_shell_command",
+    "browser_use",
+    "get_current_time",
+    "desktop_screenshot",
 }
 
 # 工具选择prompt模板 - 优化版本，更直接明确
@@ -88,7 +93,11 @@ class ToolSelector:
 
     def _get_skills_info(self) -> str:
         """获取skills信息,按照agentscope默认格式输出"""
-        if not self.toolkit or not hasattr(self.toolkit, 'skills') or not self.toolkit.skills:
+        if (
+            not self.toolkit
+            or not hasattr(self.toolkit, "skills")
+            or not self.toolkit.skills
+        ):
             return ""
 
         # agentscope默认的skill instruction
@@ -105,12 +114,26 @@ class ToolSelector:
 
         for skill_name, skill in self.toolkit.skills.items():
             # AgentSkill 是 TypedDict, 用字典方式访问
-            name = skill.get('name', skill_name) if isinstance(skill, dict) else getattr(skill, 'name', skill_name)
-            desc = skill.get('description', '') if isinstance(skill, dict) else getattr(skill, 'description', '')
-            skill_dir = skill.get('dir', '') if isinstance(skill, dict) else getattr(skill, 'dir', '')
+            name = (
+                skill.get("name", skill_name)
+                if isinstance(skill, dict)
+                else getattr(skill, "name", skill_name)
+            )
+            desc = (
+                skill.get("description", "")
+                if isinstance(skill, dict)
+                else getattr(skill, "description", "")
+            )
+            skill_dir = (
+                skill.get("dir", "")
+                if isinstance(skill, dict)
+                else getattr(skill, "dir", "")
+            )
 
             # 按照agentscope默认模板格式
-            skill_descriptions.append(f"## {name}\n{desc}\nCheck \"{skill_dir}/SKILL.md\" for how to use this skill")
+            skill_descriptions.append(
+                f'## {name}\n{desc}\nCheck "{skill_dir}/SKILL.md" for how to use this skill'
+            )
 
         return "\n".join(skill_descriptions)
 
@@ -118,7 +141,7 @@ class ToolSelector:
         """LRU缓存淘汰"""
         if len(self._cache) > CACHE_MAX_SIZE:
             # 删除一半（简单的FIFO，够用了）
-            keys_to_remove = list(self._cache.keys())[:CACHE_MAX_SIZE // 2]
+            keys_to_remove = list(self._cache.keys())[: CACHE_MAX_SIZE // 2]
             for key in keys_to_remove:
                 del self._cache[key]
             logger.debug(f"Cache evicted {len(keys_to_remove)} entries")
@@ -159,14 +182,16 @@ class ToolSelector:
             result = [tool_map[n] for n in cached_names if n in tool_map]
             logger.info(
                 f"Tool selection (cached): {len(result)}/{len(all_tools)} tools - "
-                f"{cached_names}"
+                f"{cached_names}",
             )
             return result
 
         # 2. LLM选择（带 fallback）
         selected_names = None
         try:
-            selected_names = await self._llm_select(query=query, tool_map=tool_map)
+            selected_names = await self._llm_select(
+                query=query, tool_map=tool_map
+            )
         except Exception as e:
             logger.warning(f"LLM tool selection failed, using fallback: {e}")
             # Fallback: 使用默认核心工具
@@ -195,7 +220,9 @@ class ToolSelector:
                 skill_tools = self._extract_tools_from_skill(name, tool_map)
                 if skill_tools:
                     final_tool_names.update(skill_tools)
-                    logger.info(f"Extracted tools from skill '{name}': {skill_tools}")
+                    logger.info(
+                        f"Extracted tools from skill '{name}': {skill_tools}"
+                    )
 
         # 5. 构建结果
         result = [tool_map[n] for n in final_tool_names if n in tool_map]
@@ -206,12 +233,14 @@ class ToolSelector:
 
         logger.info(
             f"Tool selection (LLM): {len(result)}/{len(all_tools)} tools - "
-            f"{list(final_tool_names)}"
+            f"{list(final_tool_names)}",
         )
 
         return result
 
-    def _extract_tools_from_skill(self, skill_name: str, tool_map: Dict[str, dict]) -> Set[str]:
+    def _extract_tools_from_skill(
+        self, skill_name: str, tool_map: Dict[str, dict]
+    ) -> Set[str]:
         """从SKILL.md中提取工具名
 
         Args:
@@ -221,7 +250,11 @@ class ToolSelector:
         Returns:
             提取到的工具名集合
         """
-        if not self.toolkit or not hasattr(self.toolkit, 'skills') or not self.toolkit.skills:
+        if (
+            not self.toolkit
+            or not hasattr(self.toolkit, "skills")
+            or not self.toolkit.skills
+        ):
             return set()
 
         # 查找skill
@@ -230,17 +263,23 @@ class ToolSelector:
             return set()
 
         # 获取skill目录
-        skill_dir = skill.get('dir', '') if isinstance(skill, dict) else getattr(skill, 'dir', '')
+        skill_dir = (
+            skill.get("dir", "")
+            if isinstance(skill, dict)
+            else getattr(skill, "dir", "")
+        )
         if not skill_dir:
             return set()
 
         # 读取SKILL.md
         skill_md_path = f"{skill_dir}/SKILL.md"
         try:
-            with open(skill_md_path, 'r', encoding='utf-8') as f:
+            with open(skill_md_path, "r", encoding="utf-8") as f:
                 content = f.read()
         except Exception as e:
-            logger.warning(f"Failed to read SKILL.md for skill '{skill_name}': {e}")
+            logger.warning(
+                f"Failed to read SKILL.md for skill '{skill_name}': {e}"
+            )
             return set()
 
         # 提取工具名：匹配markdown中的工具调用格式
@@ -248,11 +287,11 @@ class ToolSelector:
         extracted_tools = set()
 
         # 匹配 `tool_name()` 格式
-        tool_calls = re.findall(r'`([a-z_][a-z0-9_]*)\s*\(\)', content)
+        tool_calls = re.findall(r"`([a-z_][a-z0-9_]*)\s*\(\)", content)
         extracted_tools.update(tool_calls)
 
         # 匹配 **tool_name** 格式（加粗的工具名）
-        bold_tools = re.findall(r'\*\*([a-z_][a-z0-9_]*)\*\*', content)
+        bold_tools = re.findall(r"\*\*([a-z_][a-z0-9_]*)\*\*", content)
         extracted_tools.update(bold_tools)
 
         # 只保留在tool_map中存在的工具
@@ -260,7 +299,9 @@ class ToolSelector:
 
         return valid_tools
 
-    async def _llm_select(self, query: str, tool_map: Dict[str, dict]) -> Set[str]:
+    async def _llm_select(
+        self, query: str, tool_map: Dict[str, dict]
+    ) -> Set[str]:
         """使用LLM选择工具
 
         Args:
@@ -301,14 +342,15 @@ class ToolSelector:
 
             # 处理响应（可能是流式或非流式）
             content = ""
-            if hasattr(response, '__aiter__'):
+            if hasattr(response, "__aiter__"):
                 # 流式响应
                 async for chunk in response:
                     if chunk.content:
                         content += "".join(
                             block.get("text", "")
                             for block in chunk.content
-                            if isinstance(block, dict) and block.get("type") == "text"
+                            if isinstance(block, dict)
+                            and block.get("type") == "text"
                         )
             else:
                 # 非流式响应
@@ -326,14 +368,16 @@ class ToolSelector:
             # 移除可能的markdown代码块
             if content.startswith("```"):
                 lines = content.split("\n")
-                content = "\n".join(lines[1:-1] if lines[-1] == "```" else lines[1:])
+                content = "\n".join(
+                    lines[1:-1] if lines[-1] == "```" else lines[1:]
+                )
 
             # 提取JSON数组 - 尝试多种方式
             selected = None
 
             # 方式1: 找最后一个完整的 [...] 块
             # 使用非贪婪匹配找所有 [...] 块，取最后一个
-            all_json_matches = re.findall(r'\[[^\[\]]*\]', content, re.DOTALL)
+            all_json_matches = re.findall(r"\[[^\[\]]*\]", content, re.DOTALL)
             if all_json_matches:
                 # 从后往前尝试解析
                 for match in reversed(all_json_matches):
@@ -348,15 +392,17 @@ class ToolSelector:
             # 方式2: 如果方式1失败，尝试更宽松的匹配
             if selected is None:
                 # 找最后一个 [ 开始的块，尝试截取到合理位置
-                last_bracket = content.rfind('[')
+                last_bracket = content.rfind("[")
                 if last_bracket != -1:
                     # 尝试找到匹配的 ]
                     bracket_content = content[last_bracket:]
                     # 尝试截取到第一个 ] 后
-                    end_idx = bracket_content.find(']')
+                    end_idx = bracket_content.find("]")
                     if end_idx != -1:
                         try:
-                            candidate = json.loads(bracket_content[:end_idx+1])
+                            candidate = json.loads(
+                                bracket_content[: end_idx + 1]
+                            )
                             if isinstance(candidate, list):
                                 selected = candidate
                         except json.JSONDecodeError:
@@ -365,12 +411,18 @@ class ToolSelector:
             if selected:
                 # 验证工具名称存在（工具名或skill名都有效）
                 skill_names = set()
-                if self.toolkit and hasattr(self.toolkit, 'skills') and self.toolkit.skills:
+                if (
+                    self.toolkit
+                    and hasattr(self.toolkit, "skills")
+                    and self.toolkit.skills
+                ):
                     skill_names = set(self.toolkit.skills.keys())
 
                 valid_selected = [
-                    n for n in selected
-                    if isinstance(n, str) and (n in tool_map or n in skill_names)
+                    n
+                    for n in selected
+                    if isinstance(n, str)
+                    and (n in tool_map or n in skill_names)
                 ]
                 if valid_selected:
                     return set(valid_selected)
@@ -392,7 +444,9 @@ class ToolSelector:
         logger.info("Tool selection cache cleared")
 
 
-def compress_tool_schema(schema: dict, keep_description_length: int = 80) -> dict:
+def compress_tool_schema(
+    schema: dict, keep_description_length: int = 80
+) -> dict:
     """压缩工具schema，减少token
 
     Args:
@@ -434,6 +488,6 @@ def compress_tool_schema(schema: dict, keep_description_length: int = 80) -> dic
                 "type": params.get("type", "object"),
                 "required": params.get("required", []),
                 "properties": compressed_props,
-            }
-        }
+            },
+        },
     }

@@ -361,7 +361,11 @@ class CoPawAgent(ReActAgent):
                     client,
                     namesake_strategy=namesake_strategy,
                 )
-            except (ClosedResourceError, asyncio.CancelledError, McpError) as error:
+            except (
+                ClosedResourceError,
+                asyncio.CancelledError,
+                McpError,
+            ) as error:
                 if self._should_propagate_cancelled_error(error):
                     raise
                 logger.warning(
@@ -547,7 +551,9 @@ class CoPawAgent(ReActAgent):
 
         # Log the formatted messages that will be sent to LLM
         try:
-            formatted_msgs = await self.formatter.format(self.memory.get_memory())
+            formatted_msgs = await self.formatter.format(
+                self.memory.get_memory()
+            )
             all_tools = self.toolkit.get_json_schemas()
             logger.debug(
                 "=== LLM Request ===\n"
@@ -657,16 +663,20 @@ class CoPawAgent(ReActAgent):
         if query and all_tools:
             # 延迟初始化 ToolSelector
             if self._tool_selector is None:
-                self._tool_selector = ToolSelector(model=self.model, toolkit=self.toolkit)
+                self._tool_selector = ToolSelector(
+                    model=self.model, toolkit=self.toolkit
+                )
 
             # 使用LLM选择工具（会抛出异常如果失败）
-            self._selected_tools_cache = await self._tool_selector.select_tools(
-                query=query,
-                all_tools=all_tools,
+            self._selected_tools_cache = (
+                await self._tool_selector.select_tools(
+                    query=query,
+                    all_tools=all_tools,
+                )
             )
             logger.info(
                 f"Tools selected: {len(self._selected_tools_cache)}/{len(all_tools)} - "
-                f"{[t['function']['name'] for t in self._selected_tools_cache]}"
+                f"{[t['function']['name'] for t in self._selected_tools_cache]}",
             )
         else:
             # 没有query或没有工具，使用全部工具

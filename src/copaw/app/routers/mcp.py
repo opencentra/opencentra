@@ -382,7 +382,9 @@ class MCPTestResult(BaseModel):
     - connection_time_ms: 连接耗时（毫秒）
     """
 
-    success: bool = Field(..., description="Whether the connection test succeeded")
+    success: bool = Field(
+        ..., description="Whether the connection test succeeded"
+    )
     error: str | None = Field(
         default=None,
         description="Error message if connection failed",
@@ -460,13 +462,17 @@ async def test_mcp_client(
         tools = []
         for tool in tools_raw:
             # 兼容不同的属性名：inputSchema（官方）和 input_schema（部分实现）
-            input_schema = getattr(tool, 'inputSchema', None) or getattr(tool, 'input_schema', None) or {}
+            input_schema = (
+                getattr(tool, "inputSchema", None)
+                or getattr(tool, "input_schema", None)
+                or {}
+            )
             tools.append(
                 MCPToolInfo(
-                    name=getattr(tool, 'name', 'unknown'),
-                    description=getattr(tool, 'description', '') or "",
+                    name=getattr(tool, "name", "unknown"),
+                    description=getattr(tool, "description", "") or "",
                     input_schema=input_schema,
-                )
+                ),
             )
 
         # 关闭客户端连接（忽略关闭错误）

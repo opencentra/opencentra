@@ -102,7 +102,9 @@ def _log_request(request: httpx.Request) -> None:
         # Build request line
         method = request.method
         url = str(request.url)
-        http_version = request.extensions.get("http_version", b"HTTP/1.1").decode()
+        http_version = request.extensions.get(
+            "http_version", b"HTTP/1.1"
+        ).decode()
 
         # Classify request type
         type_name, color, description = _classify_request(url)
@@ -132,7 +134,11 @@ def _log_request(request: httpx.Request) -> None:
 
         print("\n".join(output), file=sys.stderr, flush=True)
     except Exception as e:
-        print(f"[HTTP LOG ERROR] Failed to log request: {e}", file=sys.stderr, flush=True)
+        print(
+            f"[HTTP LOG ERROR] Failed to log request: {e}",
+            file=sys.stderr,
+            flush=True,
+        )
 
 
 def _log_response(response: httpx.Response, request_url: str = "") -> None:
@@ -144,7 +150,9 @@ def _log_response(response: httpx.Response, request_url: str = "") -> None:
             http_version = http_version.decode()
 
         # Classify response type
-        type_name, color, description = _classify_response(request_url or str(response.url))
+        type_name, color, description = _classify_response(
+            request_url or str(response.url)
+        )
 
         # Color code for status
         status_code = response.status_code
@@ -174,7 +182,12 @@ def _log_response(response: httpx.Response, request_url: str = "") -> None:
             body_text = _format_body(response.content, content_type)
             # Truncate very long streaming responses
             if len(body_text) > 5000 and "text/event-stream" in content_type:
-                body_text = body_text[:5000] + "\n... [响应内容过长，已截断，共 " + str(len(body_text)) + " 字符]"
+                body_text = (
+                    body_text[:5000]
+                    + "\n... [响应内容过长，已截断，共 "
+                    + str(len(body_text))
+                    + " 字符]"
+                )
             output.append(body_text)
         else:
             output.append("[流式响应 - 内容将在读取后显示]")
@@ -184,7 +197,11 @@ def _log_response(response: httpx.Response, request_url: str = "") -> None:
 
         print("\n".join(output), file=sys.stderr, flush=True)
     except Exception as e:
-        print(f"[HTTP LOG ERROR] Failed to log response: {e}", file=sys.stderr, flush=True)
+        print(
+            f"[HTTP LOG ERROR] Failed to log response: {e}",
+            file=sys.stderr,
+            flush=True,
+        )
 
 
 # Store original methods
@@ -192,7 +209,9 @@ _original_async_client_send = httpx.AsyncClient.send
 _original_sync_client_send = httpx.Client.send
 
 
-async def _patched_async_send(self, request: httpx.Request, **kwargs) -> httpx.Response:
+async def _patched_async_send(
+    self, request: httpx.Request, **kwargs
+) -> httpx.Response:
     """Patched AsyncClient.send that logs requests and responses."""
     request_url = str(request.url)
     _log_request(request)
@@ -201,7 +220,9 @@ async def _patched_async_send(self, request: httpx.Request, **kwargs) -> httpx.R
     return response
 
 
-def _patched_sync_send(self, request: httpx.Request, **kwargs) -> httpx.Response:
+def _patched_sync_send(
+    self, request: httpx.Request, **kwargs
+) -> httpx.Response:
     """Patched Client.send that logs requests and responses."""
     request_url = str(request.url)
     _log_request(request)
@@ -228,7 +249,10 @@ def enable_http_logging() -> None:
     httpx.Client.send = _patched_sync_send
 
     _patched = True
-    print(f"{_COLOR_GREEN}[HTTP LOG] Enabled - will print all HTTP traffic to console{_COLOR_RESET}", file=sys.stderr)
+    print(
+        f"{_COLOR_GREEN}[HTTP LOG] Enabled - will print all HTTP traffic to console{_COLOR_RESET}",
+        file=sys.stderr,
+    )
 
 
 def disable_http_logging() -> None:

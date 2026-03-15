@@ -145,6 +145,7 @@ def setup_logger(level: int | str = logging.INFO):
     # Enable full HTTP request/response logging (monkey-patch httpx)
     # This logs the complete request/response body for debugging
     from .http_logging import enable_http_logging
+
     enable_http_logging()
 
     return logger
