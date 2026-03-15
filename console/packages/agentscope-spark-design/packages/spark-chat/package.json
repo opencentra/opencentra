@@ -1,5 +1,5 @@
 {
-  "name": "@agentscope-ai/chat",
+  "name": "@opencentra-ai/chat",
   "version": "1.1.52",
   "description": "a free and open-source chat framework for building excellent LLM-powered chat experiences",
   "license": "Apache-2.0",
