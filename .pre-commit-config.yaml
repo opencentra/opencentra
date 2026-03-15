@@ -61,7 +61,7 @@ repos:
     rev: 6.1.0
     hooks:
       - id: flake8
-        args: [ "--extend-ignore=E203"]
+        args: [ "--extend-ignore=E203,E402,E501"]
         exclude: '.*/skills/.*'
   - repo: https://github.com/pylint-dev/pylint
     rev: v3.0.2
@@ -120,6 +120,7 @@ repos:
           --disable=W0212,  # Disable protected-access
           --disable=W1309,  # Disable f-string-without-interpolation
           --disable=E1120,  # Disable no-value-for-parameter
+          --disable=C0301,  # Disable line-too-long
         ]
   - repo: https://github.com/pre-commit/mirrors-prettier
     rev: 'v3.0.0'

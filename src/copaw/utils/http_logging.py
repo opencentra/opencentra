@@ -103,7 +103,8 @@ def _log_request(request: httpx.Request) -> None:
         method = request.method
         url = str(request.url)
         http_version = request.extensions.get(
-            "http_version", b"HTTP/1.1"
+            "http_version",
+            b"HTTP/1.1",
         ).decode()
 
         # Classify request type
@@ -151,7 +152,7 @@ def _log_response(response: httpx.Response, request_url: str = "") -> None:
 
         # Classify response type
         type_name, color, description = _classify_response(
-            request_url or str(response.url)
+            request_url or str(response.url),
         )
 
         # Color code for status
@@ -210,7 +211,9 @@ _original_sync_client_send = httpx.Client.send
 
 
 async def _patched_async_send(
-    self, request: httpx.Request, **kwargs
+    self,
+    request: httpx.Request,
+    **kwargs,
 ) -> httpx.Response:
     """Patched AsyncClient.send that logs requests and responses."""
     request_url = str(request.url)
@@ -221,7 +224,9 @@ async def _patched_async_send(
 
 
 def _patched_sync_send(
-    self, request: httpx.Request, **kwargs
+    self,
+    request: httpx.Request,
+    **kwargs,
 ) -> httpx.Response:
     """Patched Client.send that logs requests and responses."""
     request_url = str(request.url)

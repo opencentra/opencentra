@@ -383,7 +383,8 @@ class MCPTestResult(BaseModel):
     """
 
     success: bool = Field(
-        ..., description="Whether the connection test succeeded"
+        ...,
+        description="Whether the connection test succeeded",
     )
     error: str | None = Field(
         default=None,

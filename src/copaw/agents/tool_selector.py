@@ -132,7 +132,7 @@ class ToolSelector:
 
             # 按照agentscope默认模板格式
             skill_descriptions.append(
-                f'## {name}\n{desc}\nCheck "{skill_dir}/SKILL.md" for how to use this skill'
+                f'## {name}\n{desc}\nCheck "{skill_dir}/SKILL.md" for how to use this skill',
             )
 
         return "\n".join(skill_descriptions)
@@ -190,7 +190,8 @@ class ToolSelector:
         selected_names = None
         try:
             selected_names = await self._llm_select(
-                query=query, tool_map=tool_map
+                query=query,
+                tool_map=tool_map,
             )
         except Exception as e:
             logger.warning(f"LLM tool selection failed, using fallback: {e}")
@@ -221,7 +222,7 @@ class ToolSelector:
                 if skill_tools:
                     final_tool_names.update(skill_tools)
                     logger.info(
-                        f"Extracted tools from skill '{name}': {skill_tools}"
+                        f"Extracted tools from skill '{name}': {skill_tools}",
                     )
 
         # 5. 构建结果
@@ -239,7 +240,9 @@ class ToolSelector:
         return result
 
     def _extract_tools_from_skill(
-        self, skill_name: str, tool_map: Dict[str, dict]
+        self,
+        skill_name: str,
+        tool_map: Dict[str, dict],
     ) -> Set[str]:
         """从SKILL.md中提取工具名
 
@@ -278,7 +281,7 @@ class ToolSelector:
                 content = f.read()
         except Exception as e:
             logger.warning(
-                f"Failed to read SKILL.md for skill '{skill_name}': {e}"
+                f"Failed to read SKILL.md for skill '{skill_name}': {e}",
             )
             return set()
 
@@ -300,7 +303,9 @@ class ToolSelector:
         return valid_tools
 
     async def _llm_select(
-        self, query: str, tool_map: Dict[str, dict]
+        self,
+        query: str,
+        tool_map: Dict[str, dict],
     ) -> Set[str]:
         """使用LLM选择工具
 
@@ -369,7 +374,7 @@ class ToolSelector:
             if content.startswith("```"):
                 lines = content.split("\n")
                 content = "\n".join(
-                    lines[1:-1] if lines[-1] == "```" else lines[1:]
+                    lines[1:-1] if lines[-1] == "```" else lines[1:],
                 )
 
             # 提取JSON数组 - 尝试多种方式
@@ -401,7 +406,7 @@ class ToolSelector:
                     if end_idx != -1:
                         try:
                             candidate = json.loads(
-                                bracket_content[: end_idx + 1]
+                                bracket_content[: end_idx + 1],
                             )
                             if isinstance(candidate, list):
                                 selected = candidate
@@ -445,7 +450,8 @@ class ToolSelector:
 
 
 def compress_tool_schema(
-    schema: dict, keep_description_length: int = 80
+    schema: dict,
+    keep_description_length: int = 80,
 ) -> dict:
     """压缩工具schema，减少token
 

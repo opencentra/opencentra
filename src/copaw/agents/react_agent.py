@@ -552,7 +552,7 @@ class CoPawAgent(ReActAgent):
         # Log the formatted messages that will be sent to LLM
         try:
             formatted_msgs = await self.formatter.format(
-                self.memory.get_memory()
+                self.memory.get_memory(),
             )
             all_tools = self.toolkit.get_json_schemas()
             logger.debug(
@@ -664,7 +664,8 @@ class CoPawAgent(ReActAgent):
             # 延迟初始化 ToolSelector
             if self._tool_selector is None:
                 self._tool_selector = ToolSelector(
-                    model=self.model, toolkit=self.toolkit
+                    model=self.model,
+                    toolkit=self.toolkit,
                 )
 
             # 使用LLM选择工具（会抛出异常如果失败）

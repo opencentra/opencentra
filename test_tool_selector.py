@@ -29,7 +29,7 @@ class MockModel:
                     "type": "text",
                     "text": '["read_file", "execute_shell_command"]',
                 },
-            ]
+            ],
         )
 
 
