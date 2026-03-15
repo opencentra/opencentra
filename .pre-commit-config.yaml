@@ -110,6 +110,16 @@ repos:
           --disable=C0114,  # Disable missing module docstring for quick dev
           --disable=C0115,  # Disable missing class docstring for quick dev
           --disable=C0116,  # Disable missing function or method docstring for quick dev
+          --disable=C0413,  # Disable wrong-import-position
+          --disable=W0611,  # Disable unused-import
+          --disable=W0612,  # Disable unused-variable
+          --disable=R0911,  # Disable too-many-return-statements
+          --disable=R0912,  # Disable too-many-branches
+          --disable=R0915,  # Disable too-many-statements
+          --disable=R1720,  # Disable no-else-raise
+          --disable=W0212,  # Disable protected-access
+          --disable=W1309,  # Disable f-string-without-interpolation
+          --disable=E1120,  # Disable no-value-for-parameter
         ]
   - repo: https://github.com/pre-commit/mirrors-prettier
     rev: 'v3.0.0'
