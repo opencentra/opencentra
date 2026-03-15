@@ -118,12 +118,12 @@ Use `url` to connect to a remote HTTP MCP server:
 
 **HTTP Configuration Fields:**
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `url` | string | ✅ | MCP server URL |
-| `transport` | string | ❌ | Transport type: `sse` (default) or `streamable_http` |
-| `headers` | object | ❌ | Custom HTTP headers |
-| `timeout` | float | ❌ | Request timeout in seconds (default 30) |
+| Field       | Type   | Required | Description                                          |
+| ----------- | ------ | -------- | ---------------------------------------------------- |
+| `url`       | string | ✅       | MCP server URL                                       |
+| `transport` | string | ❌       | Transport type: `sse` (default) or `streamable_http` |
+| `headers`   | object | ❌       | Custom HTTP headers                                  |
+| `timeout`   | float  | ❌       | Request timeout in seconds (default 30)              |
 
 ---
 

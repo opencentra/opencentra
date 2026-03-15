@@ -118,12 +118,12 @@ CoPaw 支持两种 MCP 传输类型：
 
 **HTTP 配置字段说明：**
 
-| 字段 | 类型 | 必填 | 说明 |
-|------|------|------|------|
-| `url` | string | ✅ | MCP 服务器 URL |
-| `transport` | string | ❌ | 传输类型：`sse`（默认）或 `streamable_http` |
-| `headers` | object | ❌ | 自定义 HTTP 请求头 |
-| `timeout` | float | ❌ | 请求超时时间（秒），默认 30 |
+| 字段        | 类型   | 必填 | 说明                                        |
+| ----------- | ------ | ---- | ------------------------------------------- |
+| `url`       | string | ✅   | MCP 服务器 URL                              |
+| `transport` | string | ❌   | 传输类型：`sse`（默认）或 `streamable_http` |
+| `headers`   | object | ❌   | 自定义 HTTP 请求头                          |
+| `timeout`   | float  | ❌   | 请求超时时间（秒），默认 30                 |
 
 ---
 

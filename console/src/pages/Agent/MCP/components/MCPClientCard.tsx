@@ -186,7 +186,9 @@ export function MCPClientCard({
               padding: "8px 12px",
               borderRadius: 6,
               backgroundColor: testResult.success ? "#f6ffed" : "#fff2f0",
-              borderLeft: `3px solid ${testResult.success ? "#52c41a" : "#ff4d4f"}`,
+              borderLeft: `3px solid ${
+                testResult.success ? "#52c41a" : "#ff4d4f"
+              }`,
             }}
           >
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
@@ -203,7 +205,9 @@ export function MCPClientCard({
                 }}
               >
                 {testResult.success
-                  ? `${t("mcp.connectionSuccess")} (${testResult.connection_time_ms}ms)`
+                  ? `${t("mcp.connectionSuccess")} (${
+                      testResult.connection_time_ms
+                    }ms)`
                   : t("mcp.connectionFailed")}
               </span>
             </div>
@@ -348,25 +352,26 @@ export function MCPClientCard({
                 <div style={{ fontSize: 12, color: "#666", marginBottom: 8 }}>
                   {tool.description || t("mcp.noDescription")}
                 </div>
-                {tool.input_schema && Object.keys(tool.input_schema).length > 0 && (
-                  <details style={{ fontSize: 11 }}>
-                    <summary style={{ cursor: "pointer", color: "#1890ff" }}>
-                      {t("mcp.inputSchema")}
-                    </summary>
-                    <pre
-                      style={{
-                        fontSize: 10,
-                        backgroundColor: "#f5f5f5",
-                        padding: 8,
-                        borderRadius: 4,
-                        overflow: "auto",
-                        maxHeight: 200,
-                      }}
-                    >
-                      {JSON.stringify(tool.input_schema, null, 2)}
-                    </pre>
-                  </details>
-                )}
+                {tool.input_schema &&
+                  Object.keys(tool.input_schema).length > 0 && (
+                    <details style={{ fontSize: 11 }}>
+                      <summary style={{ cursor: "pointer", color: "#1890ff" }}>
+                        {t("mcp.inputSchema")}
+                      </summary>
+                      <pre
+                        style={{
+                          fontSize: 10,
+                          backgroundColor: "#f5f5f5",
+                          padding: 8,
+                          borderRadius: 4,
+                          overflow: "auto",
+                          maxHeight: 200,
+                        }}
+                      >
+                        {JSON.stringify(tool.input_schema, null, 2)}
+                      </pre>
+                    </details>
+                  )}
               </div>
             ))}
           </div>
