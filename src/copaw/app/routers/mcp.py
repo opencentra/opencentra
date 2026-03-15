@@ -5,7 +5,7 @@ from __future__ import annotations
 
 import asyncio
 import time
-from typing import Dict, List, Optional, Literal, Any
+from typing import Dict, List, Optional, Literal
 
 from fastapi import APIRouter, Body, HTTPException, Path
 from pydantic import BaseModel, Field

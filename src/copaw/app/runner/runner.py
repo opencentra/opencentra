@@ -179,8 +179,7 @@ class AgentRunner(Runner):
                 error_msg = f"MCP 服务连接失败: {failed_mcps}"
                 logger.warning(error_msg)
                 raise RuntimeError(error_msg) from exc
-            else:
-                raise RuntimeError("Task has been cancelled!") from exc
+            raise RuntimeError("Task has been cancelled!") from exc
         except Exception as e:
             debug_dump_path = write_query_error_dump(
                 request=request,

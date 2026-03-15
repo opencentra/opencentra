@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# pylint: disable=wrong-import-position,no-value-for-parameter
 """测试工具选择器"""
 import asyncio
 import sys

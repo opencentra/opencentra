@@ -313,7 +313,7 @@ class ToolSelector:
         """
         # 构建工具摘要列表
         tool_summaries = []
-        for name, tool in tool_map.items():
+        for _, tool in tool_map.items():
             summary = self._get_tool_summary(tool)
             tool_summaries.append(summary)
 
@@ -433,7 +433,7 @@ class ToolSelector:
 
         except json.JSONDecodeError as e:
             logger.error(f"JSON parse error: {e}")
-            raise RuntimeError(f"工具选择失败：解析错误。请重新描述您的需求。") from e
+            raise RuntimeError("工具选择失败：解析错误。请重新描述您的需求。。") from e
         except Exception as e:
             logger.error(f"LLM tool selection failed: {e}")
             raise RuntimeError(f"工具选择失败：{e}。请重新描述您的需求。") from e
