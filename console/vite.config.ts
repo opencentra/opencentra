@@ -28,7 +28,7 @@ export default defineConfig(({ mode }) => {
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "./src"),
-        "@agentscope-ai/chat": path.resolve(__dirname, "./packages/agentscope-spark-design/packages/spark-chat/lib"),
+        "@opencentra-ai/chat": path.resolve(__dirname, "./packages/agentscope-spark-design/packages/spark-chat/lib"),
       },
     },
     server: {
