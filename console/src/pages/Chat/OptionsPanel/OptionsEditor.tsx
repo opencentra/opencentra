@@ -60,6 +60,15 @@ const OptionsEditor: React.FC<OptionsEditorProps> = ({ value, onChange }) => {
         layout="vertical"
         initialValues={value}
       >
+        {/* Model settings at top - Qwen3 thinking mode toggle */}
+        <Form.Item
+          name="enable_thinking"
+          label="Enable Thinking (Qwen3)"
+          valuePropName="checked"
+        >
+          <Switch />
+        </Form.Item>
+
         <Divider orientation="left">Theme</Divider>
 
         <FormItem
@@ -173,6 +182,7 @@ const OptionsEditor: React.FC<OptionsEditorProps> = ({ value, onChange }) => {
         <FormItem name={["api", "token"]} label="token">
           <Input />
         </FormItem>
+
       </Form>
 
       <div className={styles.actions}>

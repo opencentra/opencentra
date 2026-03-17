@@ -31,6 +31,8 @@ const defaultConfig = {
     baseURL: "",
     token: "",
   },
+  // Qwen3 思考模式开关 (false = 关闭思考模式, true = 开启思考模式)
+  enable_thinking: false,
 } as const;
 
 export default defaultConfig;

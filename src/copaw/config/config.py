@@ -161,6 +161,13 @@ class AgentsRunningConfig(BaseModel):
             "Maximum input length (tokens) for the model context window"
         ),
     )
+    enable_qwen3_thinking: bool = Field(
+        default=False,
+        description=(
+            "Enable Qwen3 thinking mode (enable_thinking in chat_template_kwargs). "
+            "Set to False to disable thinking mode for vLLM endpoints."
+        ),
+    )
 
 
 class AgentsConfig(BaseModel):

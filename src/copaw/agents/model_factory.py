@@ -29,6 +29,7 @@ except ImportError:  # pragma: no cover - compatibility fallback
     AnthropicChatModel = None
 
 from .utils.tool_message_utils import _sanitize_tool_messages
+from ..config import load_config
 from ..local_models import create_local_chat_model
 from ..providers import (
     get_active_llm_config,
@@ -416,9 +417,25 @@ def _create_remote_model_instance(
         "https://coding.dashscope.aliyuncs.com/v1",
     ]
 
-    client_kwargs = {"base_url": base_url}
+    # ============================================================
+    # Qwen3 思考模式开关支持
+    # 从配置中读取 enable_qwen3_thinking 设置
+    # 用于控制 vLLM 端点的 Qwen3 模型是否输出思考过程
+    # 参考: https://github.com/QwenLM/Qwen3
+    # ============================================================
+    config = load_config()
+    enable_qwen3_thinking = getattr(
+        config.agents.running,
+        "enable_qwen3_thinking",
+        False,
+    )
 
+    client_kwargs: dict[str, Any] = {"base_url": base_url}
+    generate_kwargs: dict[str, Any] | None = None
+
+    # Handle different endpoint types
     if base_url in dashscope_base_urls:
+        # Dashscope endpoints: add custom header
         client_kwargs["default_headers"] = {
             "x-dashscope-agentapp": json.dumps(
                 {
@@ -430,6 +447,19 @@ def _create_remote_model_instance(
                 ensure_ascii=False,
             ),
         }
+    else:
+        # ============================================================
+        # 非 Dashscope 的 vLLM 端点: 通过 extra_body 传递 chat_template_kwargs
+        # vLLM 使用 chat_template_kwargs 参数来控制 Qwen3 的思考模式
+        # - enable_thinking=True: 开启思考模式, 模型会输出 <think...</think 间> 标签
+        # - enable_thinking=False: 关闭思考模式, 模型直接输出最终答案
+        # 注意: chat_template_kwargs 必须通过 extra_body 传递, 不能作为顶层参数
+        # ============================================================
+        generate_kwargs = {
+            "extra_body": {
+                "chat_template_kwargs": {"enable_thinking": enable_qwen3_thinking},
+            },
+        }
 
     # Instantiate model
     model = chat_model_class(
@@ -437,6 +467,7 @@ def _create_remote_model_instance(
         api_key=api_key,
         stream=True,
         client_kwargs=client_kwargs,
+        generate_kwargs=generate_kwargs,
     )
 
     return model

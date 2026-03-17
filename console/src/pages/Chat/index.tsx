@@ -2,17 +2,19 @@ import {
   AgentScopeRuntimeWebUI,
   IAgentScopeRuntimeWebUIOptions,
 } from "@opencentra-ai/chat";
-import { useMemo, useState } from "react";
-import { Modal, Button, Result } from "antd";
+import { useMemo, useState, useEffect } from "react";
+import { Modal, Button, Result, message } from "antd";
 import { ExclamationCircleOutlined, SettingOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import sessionApi from "./sessionApi";
 import { useLocalStorageState } from "ahooks";
 import defaultConfig, { DefaultConfig } from "./OptionsPanel/defaultConfig";
+import OptionsPanel from "./OptionsPanel";
 import Weather from "./Weather";
 import { getApiUrl, getApiToken } from "../../api/config";
 import { providerApi } from "../../api/modules/provider";
+import { agentApi } from "../../api/modules/agent";
 import "./index.module.less";
 
 interface CustomWindow extends Window {
@@ -29,7 +31,7 @@ export default function ChatPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [showModelPrompt, setShowModelPrompt] = useState(false);
-  const [optionsConfig] = useLocalStorageState<OptionsConfig>(
+  const [optionsConfig, setOptionsConfig] = useLocalStorageState<OptionsConfig>(
     "agent-scope-runtime-webui-options",
     {
       defaultValue: defaultConfig,
@@ -45,6 +47,37 @@ export default function ChatPage() {
   const handleSkipConfiguration = () => {
     setShowModelPrompt(false);
   };
+
+  // Sync enable_thinking to backend config when it changes
+  useEffect(() => {
+    const currentEnableThinking = optionsConfig?.enable_thinking;
+    // Sync to backend whenever enable_thinking changes
+    if (currentEnableThinking !== undefined) {
+      agentApi
+        .getAgentRunningConfig()
+        .then((config) => {
+          // Only update if value is different
+          if (config.enable_qwen3_thinking !== currentEnableThinking) {
+            return agentApi.updateAgentRunningConfig({
+              ...config,
+              enable_qwen3_thinking: currentEnableThinking,
+            });
+          }
+        })
+        .then((result) => {
+          if (result) {
+            message.success(
+              `Thinking mode ${
+                currentEnableThinking ? "enabled" : "disabled"
+              }`,
+            );
+          }
+        })
+        .catch((error) => {
+          console.error("Failed to sync thinking config:", error);
+        });
+    }
+  }, [optionsConfig?.enable_thinking]);
 
   const options = useMemo(() => {
     const handleModelError = () => {
@@ -95,6 +128,8 @@ export default function ChatPage() {
         user_id,
         channel,
         stream: true,
+        // Qwen3 思考模式开关 (false = 关闭思考模式)
+        enable_thinking: optionsConfig?.enable_thinking ?? false,
         ...biz_params,
       };
 
@@ -139,7 +174,24 @@ export default function ChatPage() {
   }, [optionsConfig]);
 
   return (
-    <div style={{ height: "100%", width: "100%" }}>
+    <div style={{ height: "100%", width: "100%", position: "relative" }}>
+      {/* Floating settings button */}
+      <div
+        style={{
+          position: "absolute",
+          top: 16,
+          right: 16,
+          zIndex: 1000,
+        }}
+      >
+        <OptionsPanel
+          value={optionsConfig as Record<string, unknown>}
+          onChange={(v) => {
+            setOptionsConfig(v as OptionsConfig);
+          }}
+        />
+      </div>
+
       <AgentScopeRuntimeWebUI options={options} />
 
       <Modal open={showModelPrompt} closable={false} footer={null} width={480}>
