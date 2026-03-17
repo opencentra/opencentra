@@ -41,7 +41,7 @@ export default defineConfig(({ mode }) => {
       },
     },
     optimizeDeps: {
-      include: ["diff"],
+      include: ["diff", "fdir"],
     },
     // build: {
     //   // Output to CoPaw's console directory,
