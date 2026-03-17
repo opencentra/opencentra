@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from typing import Any, List
+from typing import Any, List, Literal
 
 from fastapi import APIRouter, Body, HTTPException, Path, Request
+from pydantic import BaseModel, Field
 
 from ...config import (
     load_config,
@@ -18,6 +19,23 @@ from ...config.config import HeartbeatConfig
 from .schemas_config import HeartbeatBody
 
 router = APIRouter(prefix="/config", tags=["config"])
+
+
+class TestMessageRequest(BaseModel):
+    """Request body for sending test message."""
+
+    receive_id: str = Field(
+        ...,
+        description="接收者ID (open_id / chat_id / union_id)",
+    )
+    receive_id_type: Literal["open_id", "chat_id", "union_id"] = Field(
+        default="open_id",
+        description="ID类型",
+    )
+    message: str = Field(
+        default="这是一条来自OpenCentra的测试消息",
+        description="测试消息内容",
+    )
 
 
 @router.get(
@@ -184,3 +202,54 @@ async def put_heartbeat(
         await cron_manager.reschedule_heartbeat()
 
     return hb.model_dump(mode="json", by_alias=True)
+
+
+@router.post(
+    "/channels/feishu/test",
+    summary="Send test message to Feishu",
+    description="Send a test message to Feishu channel to verify configuration",
+)
+async def test_feishu_message(
+    request: Request,
+    body: TestMessageRequest = Body(..., description="Test message parameters"),
+) -> dict:
+    """Send a test message to Feishu channel."""
+    config = load_config()
+    feishu_config = config.channels.feishu
+
+    if not feishu_config.enabled:
+        raise HTTPException(
+            status_code=400,
+            detail="Feishu channel is not enabled",
+        )
+
+    if not feishu_config.app_id or not feishu_config.app_secret:
+        raise HTTPException(
+            status_code=400,
+            detail="Feishu app_id and app_secret are required",
+        )
+
+    channel_manager = getattr(request.app.state, "channel_manager", None)
+    if channel_manager is None:
+        raise HTTPException(
+            status_code=500,
+            detail="Channel manager not initialized",
+        )
+
+    try:
+        await channel_manager.send_text(
+            channel="feishu",
+            user_id=body.receive_id,
+            session_id="",
+            text=body.message,
+            meta={
+                "feishu_receive_id": body.receive_id,
+                "feishu_receive_id_type": body.receive_id_type,
+            },
+        )
+        return {"success": True, "message": "Test message sent successfully"}
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to send test message: {str(e)}",
+        )

@@ -272,7 +272,18 @@
     "voiceSetupLink": "Open Twilio Console",
     "filterAll": "All",
     "builtin": "Built-in",
-    "custom": "Custom"
+    "custom": "Custom",
+    "feishuTestInfo": "After saving the configuration, fill in the receiver ID and message content, then click to send a test message",
+    "feishuTestReceiveId": "Receiver ID",
+    "feishuTestReceiveIdRequired": "Please enter receiver ID",
+    "feishuTestReceiveIdType": "ID Type",
+    "feishuTestMessage": "Test Message",
+    "feishuTestDefaultMessage": "This is a test message from OpenCentra",
+    "feishuTestSend": "Send Test Message",
+    "feishuTestSending": "Sending...",
+    "feishuTestSuccess": "Test message sent successfully",
+    "feishuTestFailed": "Failed to send test message",
+    "feishuTestError": "Error sending test message"
   },
   "sessions": {
     "title": "Sessions",

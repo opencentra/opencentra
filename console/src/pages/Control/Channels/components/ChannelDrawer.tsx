@@ -7,11 +7,14 @@ import {
   Switch,
   Button,
   Select,
+  message,
 } from "@agentscope-ai/design";
-import { LinkOutlined } from "@ant-design/icons";
+import { LinkOutlined, SendOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
+import { useState } from "react";
 import type { FormInstance } from "antd";
 import { getChannelLabel, type ChannelKey } from "./constants";
+import { channelApi } from "../../../../api/modules/channel";
 import styles from "../index.module.less";
 
 interface ChannelDrawerProps {
@@ -52,6 +55,47 @@ export function ChannelDrawer({
 }: ChannelDrawerProps) {
   const { t } = useTranslation();
   const label = activeKey ? getChannelLabel(activeKey) : activeLabel;
+
+  // 飞书测试消息状态（消息文本不需要保存，保持独立state）
+  const [testSending, setTestSending] = useState(false);
+  const [testMessageText, setTestMessageText] = useState(
+    "这是一条来自OpenCentra的测试消息🎉"
+  );
+
+  // 发送测试消息
+  const handleSendTestMessage = async () => {
+    // 从表单获取接收者ID和类型
+    const receiveId = form.getFieldValue("notify_receive_id") || "";
+    const receiveIdType =
+      form.getFieldValue("notify_receive_id_type") || "open_id";
+
+    if (!receiveId.trim()) {
+      message.error(t("channels.feishuTestReceiveIdRequired"));
+      return;
+    }
+
+    setTestSending(true);
+    try {
+      const response = await channelApi.testFeishuMessage({
+        receive_id: receiveId.trim(),
+        receive_id_type: receiveIdType,
+        message: testMessageText || t("channels.feishuTestDefaultMessage"),
+      });
+
+      if (response.success) {
+        message.success(t("channels.feishuTestSuccess"));
+      } else {
+        message.error(response.message || t("channels.feishuTestFailed"));
+      }
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { detail?: string } } };
+      message.error(
+        err?.response?.data?.detail || t("channels.feishuTestError")
+      );
+    } finally {
+      setTestSending(false);
+    }
+  };
 
   // Renders builtin channel-specific fields
   const renderBuiltinExtraFields = (key: ChannelKey) => {
@@ -166,6 +210,55 @@ export function ChannelDrawer({
             <Form.Item name="media_dir" label="Media Dir">
               <Input placeholder="~/.copaw/media" />
             </Form.Item>
+
+            <Alert
+              type="info"
+              showIcon
+              message={t("channels.feishuTestInfo")}
+              style={{ marginBottom: 16, marginTop: 16 }}
+            />
+
+            <Form.Item
+              name="notify_receive_id"
+              label={t("channels.feishuTestReceiveId")}
+              help={t("channels.feishuTestReceiveIdRequired")}
+            >
+              <Input placeholder="ou_xxx" />
+            </Form.Item>
+            <Form.Item
+              name="notify_receive_id_type"
+              label={t("channels.feishuTestReceiveIdType")}
+              initialValue="open_id"
+            >
+              <Select
+                options={[
+                  { value: "open_id", label: "open_id" },
+                  { value: "chat_id", label: "chat_id" },
+                  { value: "union_id", label: "union_id" },
+                ]}
+              />
+            </Form.Item>
+            <Form.Item label={t("channels.feishuTestMessage")}>
+              <Input.TextArea
+                rows={2}
+                placeholder={t("channels.feishuTestDefaultMessage")}
+                value={testMessageText}
+                onChange={(e) => setTestMessageText(e.target.value)}
+              />
+            </Form.Item>
+            <Form.Item>
+              <Button
+                type="primary"
+                icon={<SendOutlined />}
+                loading={testSending}
+                onClick={handleSendTestMessage}
+                disabled={!initialValues?.enabled || testSending}
+              >
+                {testSending
+                  ? t("channels.feishuTestSending")
+                  : t("channels.feishuTestSend")}
+              </Button>
+            </Form.Item>
           </>
         );
       case "qq":
@@ -258,9 +351,9 @@ export function ChannelDrawer({
 
   // Renders custom channel fields as key-value editor
   const renderCustomExtraFields = (
-    initialValues: Record<string, unknown> | undefined,
+    customInitialValues: Record<string, unknown> | undefined,
   ) => {
-    if (!initialValues) return null;
+    if (!customInitialValues) return null;
 
     // Get extra fields (exclude base fields)
     const baseFields = [
@@ -270,7 +363,7 @@ export function ChannelDrawer({
       "filter_thinking",
       "isBuiltin",
     ];
-    const extraKeys = Object.keys(initialValues).filter(
+    const extraKeys = Object.keys(customInitialValues).filter(
       (k) => !baseFields.includes(k),
     );
 
@@ -280,7 +373,7 @@ export function ChannelDrawer({
       <>
         <div style={{ marginBottom: 8, fontWeight: 500 }}>Custom Fields</div>
         {extraKeys.map((fieldKey) => {
-          const value = initialValues[fieldKey];
+          const value = customInitialValues[fieldKey];
           const isBoolean = typeof value === "boolean";
           const isNumber = typeof value === "number";
 

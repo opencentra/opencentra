@@ -60,6 +60,8 @@ class FeishuConfig(BaseChannelConfig):
     encrypt_key: str = ""
     verification_token: str = ""
     media_dir: str = "~/.copaw/media"
+    notify_receive_id: str = ""
+    notify_receive_id_type: Literal["open_id", "chat_id", "union_id"] = "open_id"
 
 
 class QQConfig(BaseChannelConfig):
