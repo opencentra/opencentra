@@ -182,7 +182,6 @@ const OptionsEditor: React.FC<OptionsEditorProps> = ({ value, onChange }) => {
         <FormItem name={["api", "token"]} label="token">
           <Input />
         </FormItem>
-
       </Form>
 
       <div className={styles.actions}>

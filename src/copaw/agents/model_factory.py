@@ -457,7 +457,9 @@ def _create_remote_model_instance(
         # ============================================================
         generate_kwargs = {
             "extra_body": {
-                "chat_template_kwargs": {"enable_thinking": enable_qwen3_thinking},
+                "chat_template_kwargs": {
+                    "enable_thinking": enable_qwen3_thinking,
+                },
             },
         }
 

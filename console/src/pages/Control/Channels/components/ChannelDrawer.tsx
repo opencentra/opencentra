@@ -59,7 +59,7 @@ export function ChannelDrawer({
   // 飞书测试消息状态（消息文本不需要保存，保持独立state）
   const [testSending, setTestSending] = useState(false);
   const [testMessageText, setTestMessageText] = useState(
-    "这是一条来自OpenCentra的测试消息🎉"
+    "这是一条来自OpenCentra的测试消息🎉",
   );
 
   // 发送测试消息
@@ -90,7 +90,7 @@ export function ChannelDrawer({
     } catch (error: unknown) {
       const err = error as { response?: { data?: { detail?: string } } };
       message.error(
-        err?.response?.data?.detail || t("channels.feishuTestError")
+        err?.response?.data?.detail || t("channels.feishuTestError"),
       );
     } finally {
       setTestSending(false);

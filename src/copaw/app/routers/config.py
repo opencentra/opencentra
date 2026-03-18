@@ -211,7 +211,10 @@ async def put_heartbeat(
 )
 async def test_feishu_message(
     request: Request,
-    body: TestMessageRequest = Body(..., description="Test message parameters"),
+    body: TestMessageRequest = Body(
+        ...,
+        description="Test message parameters",
+    ),
 ) -> dict:
     """Send a test message to Feishu channel."""
     config = load_config()
@@ -252,4 +255,4 @@ async def test_feishu_message(
         raise HTTPException(
             status_code=500,
             detail=f"Failed to send test message: {str(e)}",
-        )
+        ) from e

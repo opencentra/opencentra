@@ -67,9 +67,7 @@ export default function ChatPage() {
         .then((result) => {
           if (result) {
             message.success(
-              `Thinking mode ${
-                currentEnableThinking ? "enabled" : "disabled"
-              }`,
+              `Thinking mode ${currentEnableThinking ? "enabled" : "disabled"}`,
             );
           }
         })

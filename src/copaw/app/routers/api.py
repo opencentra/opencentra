@@ -69,4 +69,4 @@ async def feishu_send(
         raise HTTPException(
             status_code=500,
             detail=f"Failed to send message: {str(e)}",
-        )
+        ) from e
